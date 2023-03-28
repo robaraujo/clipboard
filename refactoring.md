@@ -9,7 +9,8 @@ Write up a brief (~1 paragraph) explanation of why you made the choices you did 
 
 ## Improvements
 
-1) Move constants out of fn so they can be used in other files like tests
+1) Move constants out of exports.deterministicPartitionKe so they can be used in other files like tests
 2) Excessive indentation removed for easier reading
 3) If empty event, return default value
-4) If partitionKey is empty a hash will be generated, so there is not need to test length and is string
+4) If partitionKey is empty a hash will be generated, so there is not need to test length and isString
+5) Create generatePartitionKey fn to be reused and avoid code duplication
