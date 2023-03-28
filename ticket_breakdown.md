@@ -14,62 +14,90 @@ Based on the information given, break this ticket down into 2-5 individual ticke
 You will be graded on the level of detail in each ticket, the clarity of the execution plan within and between tickets, and the intelligibility of your language. You don't need to be a native English speaker, but please proof-read your work.
 
 ## Tickets
+For the tickets below, I'm assuming that:
+1) Custom agent ID may be different for the same agent but in a different facility.
+2) We are not using any ORM that will automatically add the AgentsFacilities to the Agents queries.
 
-# 1: Create AgentsFacilities table and Endpoint
+### **TASK 1: Create AgentsFacilities table**
 
-Acceptance criteria:
-1) Create the new AgentsFacilities table to save custom agent ID for each facility.
-2) Create an endpoint that will receive the agenteId and customAgentId and generate a new registry into AgentsFacilities using the logged Facility as facility_id. Before saving a new AgentsFacilities, make sure:
-2.1) AgentsFacilities row is unique for this agent/facility, otherwise remove old rows
-2.2) customAgentId is unique for this facility.
+**Acceptance criteria:**:  
+Create the new AgentsFacilities table to save custom agent ID for each facility.
 
-Implementation details:
-1) Table details:
-CREATE TABLE IF NOT EXISTS AgentsFacilities(
-  agent_id INTEGER,
-  facility_id INTEGER,
-  custom_agent_id VARCHAR(255),
-  FOREIGN KEY (agent_id) REFERENCES Agents(id) ON DELETE CASCADE,
-  FOREIGN KEY (facility_id) REFERENCES Facilities(id) ON DELETE CASCADE,
-  CONSTRAINT unique_custom_by_facility UNIQUE (facility_id, custom_agent_id)
-)
+**Implementation details**:  
+Table details:    
+CREATE TABLE IF NOT EXISTS AgentsFacilities(  
+  agent_id INTEGER,  
+  facility_id INTEGER,  
+  custom_agent_id VARCHAR(255),  
+  FOREIGN KEY (agent_id) REFERENCES Agents(id) ON DELETE CASCADE,  
+  FOREIGN KEY (facility_id) REFERENCES Facilities(id) ON DELETE CASCADE,  
+)  
+Create migrations and seeds if applicable.  
 
-2) Endpoint details:
-Post /agents-facilities
-Payload: { agentId: number, customAgentId: string }
-Response Status 200: Success
-Response Status 422: Unprocessable Entity
+**Time estimates:** 2 hours
 
-Time estimates: 6 hours
+### **TASK 2: Create AgentsFacilities Endpoint**
 
-# 2: Add AgentsFacilities to GET /agent/id 
-Acceptance criteria:
+**Acceptance criteria:**:  
+Create an endpoint that will receive the agentId and customAgentId and generate a new registry into AgentsFacilities using the logged Facility as facility_id. 
+Empty customAgentId can be informed   
+Before saving a new AgentsFacilities, make sure:  
+1) AgentsFacilities row is unique for this agent/facility, otherwise remove old rows  
+2) customAgentId is unique for this facility, unless it's empty.  
+
+**Implementation details**:  
+Endpoint details:  
+Post /agents-facilities  
+Payload: { agentId: number, customAgentId: string }  
+Response Status 200: Success  
+Response Status 422: Unprocessable Entity  
+
+**Time estimates:** 2 hours
+
+**Dependencies:**:  
+1: Create AgentsFacilities table  
+
+### **TASK 3: Add AgentsFacilities data to GET /agent/id**  
+**Acceptance criteria:**  
 Update GET /agent/id to return AgentsFacilities related to it
 
-Implementation details:
+**Implementation details:**  
 New Agents response will be:
 { ...oldResponse, agentsFacility: { customAgentId } }
 
-Time estimates: 1 hour
+**Time estimates:** 1 hour
 
-# 3: Update getShiftsByFacility and generateReport
-Acceptance criteria:
+**Dependencies:**:  
+1: Create AgentsFacilities table  
+2: Create AgentsFacilities Endpoint  
+
+### **TASK 4: Update getShiftsByFacility and generateReport**
+**Acceptance criteria:**  
 Update getShiftsByFacility function to also fetch AgentsFacilities tables related to the agent.
-Into the generateReport, add a Custom Agent ID column if it exists for the current client
+Into the generateReport, add a Custom Agent ID column if it exists for the current client.
 
-Implementation details:
+**Implementation details:**   
 getShiftsByFacility: Insert a left join with the AgentsFacilities, adding the column customAgentId to the query response. 
-generateReport: Add the customAgentId to the report or show an empty column.
+generateReport: Add the row.customAgentId to the report or show an empty column.
 
-Time estimates: 2 hours
+**Time estimates:** 2 hours
 
-# 4: UX - Create Custom Agent ID Section
-Acceptance criteria:
+**Dependencies:**:  
+1: Create AgentsFacilities table  
+2: Create AgentsFacilities Endpoint  
+
+### **TASK 5: UX - Create Custom Agent ID Section**
+**Acceptance criteria:**  
 Add new section into Agent profile showing custom agent ID
 Insert Add/Edit button next to the custom ID, this action will open a form to submit Custom ID field
 
-Implementation details:
+**Implementation details:**  
 1) Custom Agent ID value should be in agent.agentsFacility?.customAgentId
-2) For endpoint reference, look at Task 1: Create AgentsFacilities table and Endpoint
+2) For endpoint reference, look at Task 2: Create AgentsFacilities Endpoint
 
-Time estimates: 3 hours
+**Time estimates:** 3 hours
+
+**Dependencies:**:  
+1: Create AgentsFacilities table  
+2: Create AgentsFacilities Endpoint  
+3: Add AgentsFacilities data to GET /agent/id  
